@@ -4,6 +4,7 @@ import argparse
 from telegram import Bot
 from dotenv import load_dotenv, set_key
 from tabulate import tabulate
+import cronitor
 
 # Load environment variables
 load_dotenv()
@@ -11,9 +12,14 @@ load_dotenv()
 # Configuration
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+CRONITOR_API_KEY = os.getenv('CRONITOR_API_KEY')
 
 # API URL to monitor
 API_URL = os.getenv('API_URL')
+
+# Setup Monitoring
+cronitor.api_key = CRONITOR_API_KEY
+monitor = cronitor.Monitor('vps-availability-checker')
 
 def setup_telegram_bot():
     """Initialize Telegram bot"""
@@ -54,6 +60,10 @@ def get_all_datacenters():
         
     except Exception as e:
         print(f"Error fetching datacenters: {str(e)}")
+
+        if CRONITOR_API_KEY:
+            monitor.ping(state='fail')
+
         return []
 
 def select_os_type():
@@ -157,9 +167,17 @@ def check_vps_availability():
         
     except Exception as e:
         print(f"Error checking availability: {str(e)}")
+
+        if CRONITOR_API_KEY:
+            monitor.ping(state='fail')
+
         return []
 
 def main():
+
+    if CRONITOR_API_KEY:
+        monitor.ping(state='run')
+
     parser = argparse.ArgumentParser(description='OVH VPS Availability Checker')
     parser.add_argument('--configure', action='store_true', 
                        help='Configure target datacenters and OS type interactively')
@@ -189,9 +207,15 @@ def main():
             print("Notification sent on Telegram")
         else:
             print("No VPS availability in target datacenters at the moment.")
+        
+        if CRONITOR_API_KEY:
+            monitor.ping(state='complete')
             
     except Exception as e:
         print(f"An error occurred: {str(e)}")
+        
+        if CRONITOR_API_KEY:
+            monitor.ping(state='fail')
 
 if __name__ == "__main__":
     main()
