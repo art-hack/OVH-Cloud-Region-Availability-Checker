@@ -91,6 +91,7 @@ https://www.ovhcloud.com/en-in/vps/configurator/
 | `TELEGRAM_BOT_TOKEN` | Your Telegram bot token | Yes |
 | `TELEGRAM_CHAT_ID` | Your Telegram chat ID | Yes |
 | `API_URL` | URL to OVH Status based on the type of VPS you want | Yes |
+| `CRONITOR_API_KEY` | Api Key to monitor script executions | Optional |
 | `TARGET_DATACENTERS` | Comma-separated list of datacenter names (auto-configured) | Auto-set |
 | `OS_TYPE` | Type of VPS to monitor (auto-configured) | Auto-set |
 
@@ -113,7 +114,7 @@ requests==2.31.0
 python-telegram-bot==13.7
 python-dotenv==1.0.0
 tabulate==0.9.0
-urllib3==1.26.15
+cronitor
 ```
 
 ## Contributing
